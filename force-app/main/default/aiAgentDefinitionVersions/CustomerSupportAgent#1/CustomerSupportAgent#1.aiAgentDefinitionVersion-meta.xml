@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>Stores the ID of the active support case being worked on</description>
+        <developerName>ActiveCaseId</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Active Case Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>Stores the API token used for order status lookups</description>
+        <developerName>OrderApiToken</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Order Api Token</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>This variable may also be referred to as VerifiedCustomerId</description>
+        <developerName>VerifiedCustomerId</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Verified Customer Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>CustomerSupportAgent_v1</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>CustomerSupportAgent_v1</fullName>
+        <agentGraphRef>20Zg7000007ELrm</agentGraphRef>
+        <agentScript>20Zg7000007ECTW</agentScript>
+        <description>Customer support agent that handles cases, orders, and product FAQ.</description>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>case_management</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>order_status</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>product_faq</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Welcome the user and determine the appropriate subagent based on user input</description>
+            <genAiPluginInstructions>
+                <description>You are a Customer Support AI Agent helping users with cases, orders, and product questions.
+
+{{state.AgentScriptInternal_agent_instructions}}</description>
+                <developerName>instruction0_179g70000025s0E</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025s0E</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Handles creating and retrieving support cases for the user.</description>
+            <genAiPluginInstructions>
+                <description>You are a Customer Support AI Agent helping users with cases, orders, and product questions.</description>
+                <developerName>instruction0_179g70000025s0D</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025s0D</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>CreateCase</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>GetCase</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Creates a new support case for the user</description>
+                <invocationTarget>CreateCaseApex</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>CreateCase</localDeveloperName>
+                <masterLabel>Create Case</masterLabel>
+            </localActions>
+            <localActions>
+                <description>Retrieves details of an existing support case</description>
+                <invocationTarget>GetCaseApex</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>GetCase</localDeveloperName>
+                <masterLabel>Get Case</masterLabel>
+            </localActions>
+            <localDeveloperName>case_management</localDeveloperName>
+            <masterLabel>Case Management</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect conversation to relevant topics when user request goes off-topic</description>
+            <genAiPluginInstructions>
+                <description>You are a Customer Support AI Agent helping users with cases, orders, and product questions.</description>
+                <developerName>instruction0_179g70000025s0H</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025s0H</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Looks up the current status of a customer order using an external orders API.</description>
+            <genAiPluginInstructions>
+                <description>You are a Customer Support AI Agent helping users with cases, orders, and product questions.</description>
+                <developerName>instruction0_179g70000025s0F</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025s0F</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>GetOrderStatus</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Retrieves the current status of a customer order</description>
+                <invocationTarget>GetOrderStatusApex</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>GetOrderStatus</localDeveloperName>
+                <masterLabel>Get Order Status</masterLabel>
+            </localActions>
+            <localDeveloperName>order_status</localDeveloperName>
+            <masterLabel>Order Status</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answers product-related questions using reasoning only, with no external actions.</description>
+            <genAiPluginInstructions>
+                <description>You are a Customer Support AI Agent helping users with cases, orders, and product questions.</description>
+                <developerName>instruction0_179g70000025s0G</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025s0G</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>product_faq</localDeveloperName>
+            <masterLabel>Product FAQ</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>Customer Support</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Active</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>1</version>
+    <welcomeMessage>Hi, I&apos;m your support assistant. I can help with cases, orders, and product questions. What can I help you with today?</welcomeMessage>
+</AiAgentDefinitionVersion>

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The name of the account associated with the order</description>
+        <developerName>AccountName</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Account Name</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>Runtime condition evaluation for if statements</description>
+        <developerName>AgentScriptInternal_condition_1</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Runtime Condition 1</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The Salesforce record ID of the created order</description>
+        <developerName>OrderId</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Order Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The order number to be processed</description>
+        <developerName>OrderNumber</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Order Number</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>Stores the error message when order processing fails; passed as errorMessage to LogProcessingError</description>
+        <developerName>ProcessingError</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Processing Error</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The total amount of the order</description>
+        <developerName>TotalAmount</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Total Amount</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>Stores the validation result (isValid) from ValidateOrder and later the fulfillment status from NotifyFulfillment</description>
+        <developerName>ValidationStatus</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Validation Status</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>HeadlessOrderProcessor_v1</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>HeadlessOrderProcessor_v1</fullName>
+        <agentGraphRef>20Zg7000007EgeT</agentGraphRef>
+        <agentScript>20Zg7000007ETAz</agentScript>
+        <description>Agent invoked through the Salesforce Agent API to process incoming orders without a human conversation.</description>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>capture_order_details</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>error_handler</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>order_pipeline</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Immediately routes all API-invoked orders to the capture step. No LLM reasoning required.</description>
+            <genAiPluginInstructions>
+                <description>You are an automated order processor. Process incoming orders without human interaction.</description>
+                <developerName>instruction0_179g70000025w0c</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025w0c</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Collects OrderNumber, AccountName, and TotalAmount from the user&apos;s message using LLM reasoning. Prompts for any missing values before transitioning to the order pipeline.</description>
+            <genAiPluginInstructions>
+                <description>You are an automated order processor. Process incoming orders without human interaction.</description>
+                <developerName>instruction0_179g70000025w0f</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025w0f</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>capture_order_details</localDeveloperName>
+            <masterLabel>Capture Order Details</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Logs processing errors when any step of the order pipeline fails.</description>
+            <genAiPluginInstructions>
+                <description>You are an automated order processor. Process incoming orders without human interaction.</description>
+                <developerName>instruction0_179g70000025w0e</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025w0e</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>LogProcessingError</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Log the order processing error for audit and troubleshooting</description>
+                <invocationTarget>LogOrderErrorApex</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>LogProcessingError</localDeveloperName>
+                <masterLabel>Log Processing Error</masterLabel>
+            </localActions>
+            <localDeveloperName>error_handler</localDeveloperName>
+            <masterLabel>Error Handler</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect conversation to relevant topics when user request goes off-topic</description>
+            <genAiPluginInstructions>
+                <description>You are an automated order processor. Process incoming orders without human interaction.</description>
+                <developerName>instruction0_179g70000025w0b</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025w0b</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Executes the order processing pipeline deterministically: validate, create record, and notify fulfillment. Transitions to error_handler if any step fails.</description>
+            <genAiPluginInstructions>
+                <description>You are an automated order processor. Process incoming orders without human interaction.</description>
+                <developerName>instruction0_179g70000025w0d</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179g70000025w0d</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>NotifyFulfillment</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>ValidateOrder</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>CreateOrderRecord</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Create a Salesforce order record from validated order data</description>
+                <invocationTarget>CreateOrderRecordApex</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>CreateOrderRecord</localDeveloperName>
+                <masterLabel>Create Order Record</masterLabel>
+            </localActions>
+            <localActions>
+                <description>Notify the fulfillment system that a new order is ready for processing</description>
+                <invocationTarget>NotifyFulfillmentApex</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>NotifyFulfillment</localDeveloperName>
+                <masterLabel>Notify Fulfillment</masterLabel>
+            </localActions>
+            <localActions>
+                <description>Validate order details before processing</description>
+                <invocationTarget>ValidateOrderApex</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>ValidateOrder</localDeveloperName>
+                <masterLabel>Validate Order</masterLabel>
+            </localActions>
+            <localDeveloperName>order_pipeline</localDeveloperName>
+            <masterLabel>Order Pipeline</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>Order Processor</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Active</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>1</version>
+    <welcomeMessage>Order processor ready.</welcomeMessage>
+</AiAgentDefinitionVersion>
