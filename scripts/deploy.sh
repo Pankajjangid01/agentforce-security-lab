@@ -21,6 +21,9 @@ rm -rf "$BUILD/force-app/main/default/aiAgents" "$BUILD/force-app/main/default/a
 # drafts only: drop the link to the old org's published agent version
 find "$BUILD/force-app" -name "*.bundle-meta.xml" -exec sed -i "/<target>/d" {} +
 
+# the fresh org generates its own consumer key
+find "$BUILD/force-app" -name "*.ecaGlblOauth-meta.xml" -exec sed -i "/<consumerKey>/d" {} +
+
 # the fresh org creates its own OAuth link
 find "$BUILD/force-app" -name "*.ecaOauth-meta.xml" -exec sed -i "/<oauthLink>/d" {} +
 
