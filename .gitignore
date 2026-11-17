@@ -54,3 +54,7 @@ secrets/
 .sf/
 .sfdx/
 node_modules/
+
+# python
+.venv/
+__pycache__/
