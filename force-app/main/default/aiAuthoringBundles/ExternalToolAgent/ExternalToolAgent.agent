@@ -1,0 +1,95 @@
+system:
+    instructions: "You are a shipping assistant. You help customers get shipping quotes."
+    messages:
+        welcome: |
+            Hi! I'm your shipping assistant. I can get shipping quotes for packages. What would you like to ship?
+        error: "Sorry, something went wrong. Please try again."
+
+config:
+    developer_name: "ExternalToolAgent"
+    agent_label: "ExternalToolAgent"
+    description: "A shipping assistant that gets shipping quotes from an external tool."
+
+access:
+    default_agent_user: "test@00dg700000lfm8x617161727.ext"
+
+model_config:
+    model: "model://sfdc_ai__DefaultGPT56Luna"
+
+language:
+    default_locale: "en_US"
+    additional_locales: ""
+    all_additional_locales: False
+
+variables:
+    EndUserId: linked string
+        source: @MessagingSession.MessagingEndUserId
+        description: "This variable may also be referred to as MessagingEndUser Id"
+    RoutableId: linked string
+        source: @MessagingSession.Id
+        description: "This variable may also be referred to as MessagingSession Id"
+    ContactId: linked string
+        source: @MessagingEndUser.ContactId
+        description: "This variable may also be referred to as MessagingEndUser ContactId"
+    EndUserLanguage: linked string
+        source: @MessagingSession.EndUserLanguage
+        description: "This variable may also be referred to as MessagingSession EndUserLanguage"
+    VerifiedCustomerId: mutable string
+        description: "This variable may also be referred to as VerifiedCustomerId"
+
+knowledge:
+    rag_feature_config_id: ""
+    citations_url: ""
+    citations_enabled: False
+
+start_agent agent_router:
+    label: "Agent Router"
+    description: "Welcome the user and determine the appropriate subagent based on user input"
+    model_config:
+        model: "model://sfdc_ai__DefaultEinsteinHyperClassifier"
+    reasoning:
+        instructions: ->
+            | Select the best tool to call based on conversation history and user's intent.
+        actions:
+            go_to_shipping_quote: @utils.transition to @subagent.shipping_quote
+            go_to_off_topic: @utils.transition to @subagent.off_topic
+
+subagent shipping_quote:
+    label: "Shipping Quote"
+    description: "Handles requests for a shipping price, delivery time or carrier. Collects the destination postal code and package weight, then retrieves a quote from the external shipping tool."
+    actions:
+        GetShippingQuote:
+            description: "Retrieves a shipping quote including carrier, price, currency code, and estimated delivery days for a given destination postal code and package weight."
+            target: "apex://GetShippingQuoteApex"
+            inputs:
+                postalCode: string
+                weightKg: number
+            outputs:
+                status: string
+                carrier: string
+                price: number
+                currencyCode: string
+                etaDays: integer
+    reasoning:
+        instructions: ->
+            | You are a shipping quote assistant. Help the customer get a shipping quote.
+              Before calling {!@actions.tool_GetShippingQuote}, you must have both of the following confirmed by the customer:
+              1. Destination postal code (postalCode)
+              2. Package weight in kilograms (weightKg)
+              If either value is missing, ask the customer for it. Never guess or invent a value for postalCode or weightKg.
+              Only call {!@actions.tool_GetShippingQuote} when you have both postalCode and weightKg from the customer.
+              After the action returns:
+              - If status is exactly "Quote received": tell the customer the carrier, the price with the currency code, and the estimated delivery time in days.
+              - If status is anything other than "Quote received": tell the customer clearly that the quote could not be fetched and show the status text exactly as returned. Never invent a price, carrier, or delivery time.
+        actions:
+            tool_GetShippingQuote: @actions.GetShippingQuote
+                description: "Call this action to get a shipping quote. Only call when both postalCode and weightKg are known."
+                with postalCode=...
+                with weightKg=...
+
+subagent off_topic:
+    label: "Off Topic"
+    description: "Politely informs the customer that this assistant only handles shipping quotes."
+    reasoning:
+        instructions: ->
+            | You can only help with shipping quotes. Politely inform the customer that you are unable to assist with their request and that you can only help with shipping quotes. Do not answer any other questions.
