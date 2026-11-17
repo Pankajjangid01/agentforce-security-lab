@@ -21,6 +21,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>GetShippingQuoteApex</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>LogOrderErrorApex</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -45,6 +49,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <description>Allows custom permissions for Agentforce Agent : Test&apos;s agent user : test@00dg700000lfm8x617161727.ext.</description>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>AgentLab_External_Tool-ToolPrincipal</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Test63207935 Permissions</label>
     <license>Einstein Agent</license>

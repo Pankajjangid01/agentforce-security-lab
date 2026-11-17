@@ -17,6 +17,8 @@ def health():
 @app.post("/tools/shipping-quote")
 def shipping_quote():
     if not authorized():
+        sent = request.headers.get("X-API-Key")
+        app.logger.warning("unauthorized: header present=%s length=%s", sent is not None, len(sent) if sent else 0)
         return jsonify(error="unauthorized"), 401
     data = request.get_json(silent=True) or {}
     postal = str(data.get("postalCode", "")).strip()
