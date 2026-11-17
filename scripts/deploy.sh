@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: scripts/deploy.sh <target-org-alias>
+# Usage: scripts/deploy.sh <target-org-alias> [agent-user-username]
 set -euo pipefail
 
 ORG="${1:?Usage: scripts/deploy.sh <target-org-alias>}"
@@ -26,6 +26,13 @@ find "$BUILD/force-app" -name "*.ecaGlblOauth-meta.xml" -exec sed -i "/<consumer
 
 # the fresh org creates its own OAuth link
 find "$BUILD/force-app" -name "*.ecaOauth-meta.xml" -exec sed -i "/<oauthLink>/d" {} +
+
+# swap the agent user (only when a username is passed as 2nd argument)
+OLD_AGENT_USER="test@00dg700000lfm8x617161727.ext"
+AGENT_USER="${2:-}"
+if [ -n "$AGENT_USER" ]; then
+  grep -rl "$OLD_AGENT_USER" "$BUILD/force-app" | xargs -r sed -i "s/$OLD_AGENT_USER/$AGENT_USER/g"
+fi
 
 # swap the three org-specific values
 grep -rl -e "$OLD_ORG_ID" -e "$OLD_USER" "$BUILD/force-app" | xargs -r sed -i "s/$OLD_ORG_ID/$NEW_ORG_ID/g; s/$OLD_USER/$NEW_USER/g"
