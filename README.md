@@ -35,3 +35,17 @@ an External Client App for the Agent API, and a one-command deploy script.
 ## Secrets
 Nothing secret is stored in this repo. Use `read -rsp` for secrets in the shell and keep any
 local files in .gitignore (.env, *.secret, secrets/).
+
+## Agent 4 (ExternalToolAgent) setup notes
+- The mock external tool is in `cloudrun-service/` (Flask, API key auth, Dockerfile for Cloud Run).
+  Run locally: `export API_KEY=$(cat ~/.agentlab/api_key); python app.py` inside its virtualenv.
+- Until a billing-enabled GCP project is available, expose it with `cloudflared tunnel --url http://localhost:8080`.
+  The URL changes on every restart, so update the URL in Named Credential `NC_ExternalTool` each time.
+- External Credential `AgentLab_External_Tool`: add the principal parameter `ApiKey` by hand
+  (Setup > Named Credentials > External Credentials > Principals). Secret values are not in metadata.
+- Named Credential `NC_ExternalTool` needs "Allow Formulas in HTTP Header" on (`allowMergeFieldsInHeader`),
+  otherwise `{!$Credential...}` is sent as plain text and the tool answers 401.
+- The agent user's permission set needs Read on the object User External Credential,
+  plus External Credential Principal access and Apex access to `GetShippingQuoteApex`.
+- `AgentLab_Tester` is a normal-license permission set so an admin can test callouts from anonymous Apex
+  (`scripts/apex/test_shipping.apex`).
