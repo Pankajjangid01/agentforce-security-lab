@@ -1,0 +1,110 @@
+system:
+    instructions: "You are an AI Agent that helps customers look up and understand their orders."
+    messages:
+        welcome: |
+            Hi! I can help you get a summary of an order. Please share your order number and I'll look it up.
+        error: "Sorry, something went wrong. Please try again."
+
+config:
+    developer_name: "OrderInsightAgent"
+    agent_label: "OrderInsightAgent"
+    description: "A support assistant that summarizes one customer order."
+
+access:
+    default_agent_user: "test@00dg700000lfm8x617161727.ext"
+
+model_config:
+    model: "model://sfdc_ai__DefaultGPT56Luna"
+
+language:
+    default_locale: "en_US"
+    all_additional_locales: False
+
+variables:
+    EndUserId: linked string
+        source: @MessagingSession.MessagingEndUserId
+        description: "This variable may also be referred to as MessagingEndUser Id"
+    RoutableId: linked string
+        source: @MessagingSession.Id
+        description: "This variable may also be referred to as MessagingSession Id"
+    ContactId: linked string
+        source: @MessagingEndUser.ContactId
+        description: "This variable may also be referred to as MessagingEndUser ContactId"
+    EndUserLanguage: linked string
+        source: @MessagingSession.EndUserLanguage
+        description: "This variable may also be referred to as MessagingSession EndUserLanguage"
+    VerifiedCustomerId: mutable string
+        description: "This variable may also be referred to as VerifiedCustomerId"
+    found: mutable boolean = False
+        description: "Whether the order was found by the FindOrder action"
+    orderId: mutable string = ""
+        description: "The Salesforce record ID of the order returned by FindOrder"
+
+knowledge:
+    rag_feature_config_id: ""
+    citations_url: ""
+    citations_enabled: False
+
+start_agent agent_router:
+    label: "Agent Router"
+    description: "Welcome the user and determine the appropriate subagent based on user input"
+    model_config:
+        model: "model://sfdc_ai__DefaultEinsteinHyperClassifier"
+    reasoning:
+        instructions: ->
+            | Select the best tool to call based on conversation history and user's intent.
+        actions:
+            go_to_order_summary: @utils.transition to @subagent.order_summary
+            go_to_off_topic: @utils.transition to @subagent.off_topic
+
+subagent order_summary:
+    label: "Order Summary"
+    description: "Handles requests to look up and summarize a customer order by order number."
+    actions:
+        FindOrder:
+            description: "Look up an order by order number. Returns whether the order was found and its Salesforce record ID."
+            inputs:
+                orderNumber: string
+                    description: "The order number provided by the customer"
+                    is_required: True
+            outputs:
+                found: boolean
+                    description: "Whether the order was found"
+                orderId: string
+                    description: "The Salesforce record ID of the found order"
+            target: "apex://FindOrderApex"
+        OrderSummary:
+            description: "Generate a natural-language summary of an order using the Order Summary prompt template."
+            inputs:
+                "Input:Order": string
+                    description: "The Salesforce record ID of the Order to summarize"
+                    is_required: True
+            outputs:
+                response: string
+                    description: "The generated order summary text"
+            target: "generatePromptResponse://Order_Summary"
+    reasoning:
+        instructions: ->
+            | You help customers get a summary of their order.
+              If the customer has not provided an order number, ask them for it before calling any action. Never guess an order number.
+              When the customer provides an order number, call {!@actions.FindOrder} with that number.
+              If the found result is false, tell the customer that no order was found with that number. Do not call any other action.
+              If the found result is true, call {!@actions.invoke_order_summary} to get the order summary.
+              Show the order summary response to the customer exactly as returned. Do not add any facts that are not in the response.
+        actions:
+            FindOrder: @actions.FindOrder
+                with orderNumber=...
+                set @variables.found = @outputs.found
+                set @variables.orderId = @outputs.orderId
+            invoke_order_summary: @actions.OrderSummary
+                with "Input:Order"=@variables.orderId
+                available when @variables.found == True
+
+subagent off_topic:
+    label: "Off Topic"
+    description: "Handles requests that are not related to order summaries."
+    reasoning:
+        instructions: ->
+            | You can only help customers with order summaries.
+              Politely let the customer know that this assistant is only able to help with order summaries and cannot assist with anything else.
+              Do not answer any other questions or perform any other tasks.
